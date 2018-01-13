@@ -6,7 +6,8 @@ public class PushEntry {
 	private String content;
 	private String status;
 	private Integer payload_badge;
-	private String payload_alert;
+	private String payload_alert_body;
+	private String payload_alert_title;
 	private String payload_sound;
 	private boolean payload_content_available;
 	private String payload_category;
@@ -38,12 +39,6 @@ public class PushEntry {
 	public void setPayload_badge(Integer payload_badge) {
 		this.payload_badge = payload_badge;
 	}
-	public String getPayload_alert() {
-		return payload_alert;
-	}
-	public void setPayload_alert(String payload_alert) {
-		this.payload_alert = payload_alert;
-	}
 	public String getPayload_sound() {
 		return payload_sound;
 	}
@@ -68,5 +63,18 @@ public class PushEntry {
 	public void setPayload_threadID(String payload_threadID) {
 		this.payload_threadID = payload_threadID;
 	}
+	public String getPayload_alert_body() {
+		return payload_alert_body;
+	}
+	public void setPayload_alert_body(String payload_alert_body) {
+		this.payload_alert_body = payload_alert_body;
+	}
+	public String getPayload_alert_title() {
+		return payload_alert_title;
+	}
+	public void setPayload_alert_title(String payload_alert_title) {
+		this.payload_alert_title = payload_alert_title;
+	}
 
 }
+

@@ -130,9 +130,17 @@ public class SendPushNotification extends AbstractProcessor {
             .required(false)
             .build();
     
-    public static final PropertyDescriptor PAYLOAD_ALERT = new PropertyDescriptor
-            .Builder().name("PAYLOAD_ALERT")
+    public static final PropertyDescriptor PAYLOAD_ALERT_TITLE = new PropertyDescriptor
+            .Builder().name("PAYLOAD_ALERT_TITLE")
             .displayName("Payload: Alert Title")
+            .expressionLanguageSupported(true)
+            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
+            .required(false)
+            .build();
+    
+    public static final PropertyDescriptor PAYLOAD_ALERT_BODY = new PropertyDescriptor
+            .Builder().name("PAYLOAD_ALERT_BODY")
+            .displayName("Payload: Alert Body")
             .expressionLanguageSupported(true)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(false)
@@ -204,7 +212,8 @@ public class SendPushNotification extends AbstractProcessor {
         descriptors.add(DEVICE_TOKEN);
         descriptors.add(CUSTOM_PAYLOAD);
         descriptors.add(PAYLOAD_BADGE);
-        descriptors.add(PAYLOAD_ALERT);
+        descriptors.add(PAYLOAD_ALERT_TITLE);
+        descriptors.add(PAYLOAD_ALERT_BODY);
         descriptors.add(PAYLOAD_SOUND);
         descriptors.add(PAYLOAD_CONTENT_AVAILABLE);
         descriptors.add(PAYLOAD_CATEGORY);
@@ -254,43 +263,47 @@ public class SendPushNotification extends AbstractProcessor {
     		}
 
         	
-    		final ApnsPayloadBuilder payloadBuilder = new ApnsPayloadBuilder();
-            payloadBuilder.setAlertBody(entry.getContent());
-
-            Integer payload_badge = entry.getPayload_badge();
-            String payload_alert = entry.getPayload_alert();
-            String payload_category = entry.getPayload_category();
-            String payload_sound = entry.getPayload_sound();
-            boolean payload_content_available = entry.isPayload_content_available();
-            String payload_threadID = entry.getPayload_threadID();
-            
-            if (payload_badge != null) {
-            	payloadBuilder.setBadgeNumber(payload_badge);
-            }
-            
-            if (!StringUtil.isNullOrEmpty(payload_sound)) {
-            	payloadBuilder.setSoundFileName(payload_sound);
-            }
-            
-            if (!StringUtil.isNullOrEmpty(payload_category)) {
-            	payloadBuilder.setCategoryName(payload_category);
-            }
-
-            if (!StringUtil.isNullOrEmpty(payload_threadID)) {
-                payloadBuilder.setThreadId(payload_threadID);
-            }
-
-            if (!StringUtil.isNullOrEmpty(payload_alert)) {
-                payloadBuilder.setAlertTitle(payload_alert);
-            }
-            
-            payloadBuilder.setContentAvailable(payload_content_available);
-            	
             String payload = "";
             if (custom_payload) {
             	payload = entry.getContent();
             }
             else {
+
+        		final ApnsPayloadBuilder payloadBuilder = new ApnsPayloadBuilder();
+
+                Integer payload_badge = entry.getPayload_badge();
+                String payload_alert_body = entry.getPayload_alert_body();
+                String payload_alert_title = entry.getPayload_alert_title();
+                String payload_category = entry.getPayload_category();
+                String payload_sound = entry.getPayload_sound();
+                boolean payload_content_available = entry.isPayload_content_available();
+                String payload_threadID = entry.getPayload_threadID();
+                
+                if (payload_badge != null) {
+                	payloadBuilder.setBadgeNumber(payload_badge);
+                }
+                
+                if (!StringUtil.isNullOrEmpty(payload_sound)) {
+                	payloadBuilder.setSoundFileName(payload_sound);
+                }
+                
+                if (!StringUtil.isNullOrEmpty(payload_category)) {
+                	payloadBuilder.setCategoryName(payload_category);
+                }
+
+                if (!StringUtil.isNullOrEmpty(payload_threadID)) {
+                    payloadBuilder.setThreadId(payload_threadID);
+                }
+
+                if (!StringUtil.isNullOrEmpty(payload_alert_title)) {
+                    payloadBuilder.setAlertTitle(payload_alert_title);
+                }
+
+                if (!StringUtil.isNullOrEmpty(payload_alert_body)) {
+                    payloadBuilder.setAlertBody(payload_alert_body);
+                }
+                
+                payloadBuilder.setContentAvailable(payload_content_available);
             	payload = payloadBuilder.buildWithDefaultMaximumLength();
             }
             
@@ -372,7 +385,8 @@ public class SendPushNotification extends AbstractProcessor {
         }
         
 		Integer payload_badge = context.getProperty(PAYLOAD_BADGE).evaluateAttributeExpressions(flowFile).asInteger();
-		String payload_alert = context.getProperty(PAYLOAD_ALERT).evaluateAttributeExpressions(flowFile).getValue();
+		String payload_alert_title = context.getProperty(PAYLOAD_ALERT_TITLE).evaluateAttributeExpressions(flowFile).getValue();
+		String payload_alert_body = context.getProperty(PAYLOAD_ALERT_BODY).evaluateAttributeExpressions(flowFile).getValue();
 		String payload_sound = context.getProperty(PAYLOAD_SOUND).evaluateAttributeExpressions(flowFile).getValue();
 		boolean payload_content_available = context.getProperty(PAYLOAD_CONTENT_AVAILABLE).evaluateAttributeExpressions(flowFile).asBoolean();
 		String payload_category = context.getProperty(PAYLOAD_CATEGORY).evaluateAttributeExpressions(flowFile).getValue();
@@ -392,7 +406,8 @@ public class SendPushNotification extends AbstractProcessor {
         entry.setContent(contents);
         entry.setDeviceIdentifier(deviceIdentifier);
         entry.setPayload_badge(payload_badge);
-        entry.setPayload_alert(payload_alert);
+        entry.setPayload_alert_body(payload_alert_body);
+        entry.setPayload_alert_title(payload_alert_title);
         entry.setPayload_category(payload_category);
         entry.setPayload_sound(payload_sound);
         entry.setPayload_content_available(payload_content_available);
