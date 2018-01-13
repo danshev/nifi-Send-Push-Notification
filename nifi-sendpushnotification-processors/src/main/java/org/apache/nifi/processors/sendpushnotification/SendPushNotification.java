@@ -61,8 +61,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-@Tags({"apns apn"})
-@CapabilityDescription("Pushes JSON Content data to APNs")
+@Tags({"apns apn push"})
+@CapabilityDescription("Sends a JSON HTTP/2 message to Apple's Push Notification service (APNs).")
 @SeeAlso({})
 @ReadsAttributes({@ReadsAttribute(attribute="", description="")})
 @WritesAttributes({@WritesAttribute(attribute="", description="")})
@@ -72,7 +72,7 @@ public class SendPushNotification extends AbstractProcessor {
 
     public static final PropertyDescriptor APNS_SERVER = new PropertyDescriptor
             .Builder().name("APNS_SERVER")
-            .displayName("APNS Server Mode")
+            .displayName("APNs Server Endpoint")
             .defaultValue("Development")
             .expressionLanguageSupported(true)
             .allowableValues("Production", "Development")
@@ -82,9 +82,9 @@ public class SendPushNotification extends AbstractProcessor {
 
     public static final PropertyDescriptor APNS_NAME = new PropertyDescriptor
             .Builder().name("APNS_NAME")
-            .displayName("APNS App Package Name")
+            .displayName("Apple Identifier")
             .expressionLanguageSupported(true)
-            .description("Specify APNS Package Name")
+            .description("The unique identifier registered with Apple, typically in reverse DNS format (ex: com.example.app)")
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(true)
             .build();
@@ -92,7 +92,7 @@ public class SendPushNotification extends AbstractProcessor {
     public static final PropertyDescriptor CERT_FILE = new PropertyDescriptor
             .Builder().name("CERT_FILE")
             .displayName("Certificate File")
-            .description("Certificate File")
+            .description("The filepath to your .p12 file (created from the .cert downloaded from Apple)")
             .expressionLanguageSupported(true)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(true)
@@ -102,16 +102,16 @@ public class SendPushNotification extends AbstractProcessor {
     public static final PropertyDescriptor CERT_PASSWORD = new PropertyDescriptor
             .Builder().name("CERT_PASSWORD")
             .displayName("Certificate File Password")
-            .description("Certificate File Password")
+            .description("If necessary, the password for the Certificate File")
             .expressionLanguageSupported(true)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .sensitive(true)
-            .required(true)
+            .required(false)
             .build();
     
     public static final PropertyDescriptor DEVICE_TOKEN = new PropertyDescriptor
             .Builder().name("DEVICE_TOKEN")
-            .displayName("Device Identifier Token")
+            .displayName("Device Token (or 'Push Token')")
             .expressionLanguageSupported(true)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(false)
@@ -180,7 +180,7 @@ public class SendPushNotification extends AbstractProcessor {
 
     public static final Relationship STATUS = new Relationship.Builder()
             .name("Publish Status")
-            .description("Published to APNS Successfuly")
+            .description("Published to APNs Successfuly")
             .build();
     
     private List<PropertyDescriptor> descriptors;
