@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Implementation-Title: nifi-sendpushnotification-processors
+Implementation-Version: 1.0-SNAPSHOT
+Built-By: Ronnie
+Specification-Vendor: Apache NiFi Project
+Specification-Title: nifi-sendpushnotification-processors
+Implementation-Vendor-Id: org.apache.nifi
+Build-Jdk: 1.8.0_131
+Specification-Version: 1.0
+Implementation-URL: http://nifi.apache.org/nifi-nar-bundles/nifi-sendp
+ ushnotification/nifi-sendpushnotification-processors
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Apache NiFi Project
+
