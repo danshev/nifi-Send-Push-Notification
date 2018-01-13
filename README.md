@@ -1,0 +1,1 @@
+Created for NiFi v1.5.0 - Place compiled nifi-sendpushnotification-nar-1.0-SNAPSHOT.nar file into lib directory in NiFi, and chmod 775 the file. Restart NiFi. The new processor is called SendPushNotification
