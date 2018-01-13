@@ -112,6 +112,16 @@ public class SendPushNotification extends AbstractProcessor {
             .required(false)
             .build();
     
+    public static final PropertyDescriptor CUSTOM_PAYLOAD = new PropertyDescriptor
+            .Builder().name("CUSTOM_PAYLOAD")
+            .displayName("Custom Payload Based on FlowFile Body JSON")
+            .defaultValue("false")
+            .allowableValues("true", "false")
+            .expressionLanguageSupported(false)
+            .addValidator(StandardValidators.BOOLEAN_VALIDATOR)
+            .required(true)
+            .build();
+    
     public static final PropertyDescriptor PAYLOAD_BADGE = new PropertyDescriptor
             .Builder().name("PAYLOAD_BADGE")
             .displayName("Payload: Badge")
@@ -192,6 +202,7 @@ public class SendPushNotification extends AbstractProcessor {
         descriptors.add(CERT_PASSWORD);
         descriptors.add(APNS_SERVER);
         descriptors.add(DEVICE_TOKEN);
+        descriptors.add(CUSTOM_PAYLOAD);
         descriptors.add(PAYLOAD_BADGE);
         descriptors.add(PAYLOAD_ALERT);
         descriptors.add(PAYLOAD_SOUND);
@@ -224,6 +235,7 @@ public class SendPushNotification extends AbstractProcessor {
 		final String apns_name = context.getProperty(APNS_NAME).getValue();
 		final String cert_file = context.getProperty(CERT_FILE).getValue();
 		final String cert_password = context.getProperty(CERT_PASSWORD).getValue();
+		final boolean custom_payload = context.getProperty(CUSTOM_PAYLOAD).asBoolean();
 
     	String hostname = "";
     	int port = 443;
@@ -274,7 +286,14 @@ public class SendPushNotification extends AbstractProcessor {
             
             payloadBuilder.setContentAvailable(payload_content_available);
             	
-            final String payload = payloadBuilder.buildWithDefaultMaximumLength();
+            String payload = "";
+            if (custom_payload) {
+            	payload = entry.getContent();
+            }
+            else {
+            	payload = payloadBuilder.buildWithDefaultMaximumLength();
+            }
+            
             final String token = TokenUtil.sanitizeTokenString(entry.getDeviceIdentifier());
 
             SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(token, apns_name, payload);
