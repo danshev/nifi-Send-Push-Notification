@@ -142,7 +142,7 @@ public class SendPushNotification extends AbstractProcessor {
             .defaultValue("true")
             .allowableValues("true", "false")
             .expressionLanguageSupported(true)
-            .addValidator(StandardValidators.BOOLEAN_VALIDATOR)
+            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(false)
             .build();
 
@@ -192,14 +192,14 @@ public class SendPushNotification extends AbstractProcessor {
         descriptors.add(APNS_NAME);
         descriptors.add(CERT_FILE);
         descriptors.add(CERT_PASSWORD);
+        descriptors.add(APNS_SERVER);
+        descriptors.add(DEVICE_TOKEN);
         descriptors.add(PAYLOAD_BADGE);
         descriptors.add(PAYLOAD_ALERT);
         descriptors.add(PAYLOAD_SOUND);
         descriptors.add(PAYLOAD_CONTENT_AVAILABLE);
         descriptors.add(PAYLOAD_CATEGORY);
         descriptors.add(PAYLOAD_THREAD_ID);
-        descriptors.add(DEVICE_TOKEN);
-        descriptors.add(APNS_SERVER);
         this.descriptors = Collections.unmodifiableList(descriptors);
 
         final Set<Relationship> relationships = new HashSet<Relationship>();
@@ -313,7 +313,7 @@ public class SendPushNotification extends AbstractProcessor {
                 	    	  response.add(responseEntry);
                 	      }
                 	      else {
-                  	    	  getLogger().error("SendPushNotification: Denied: " + pushNotificationResponse.getRejectionReason());
+                  	    	  getLogger().error("SendPushNotification: Denied for " + entry.getDeviceIdentifier() + ". Reason: " + pushNotificationResponse.getRejectionReason());
                 	    	  PushEntry responseEntry = new PushEntry();
                 	    	  responseEntry.setContent(entry.getContent());
                 	    	  responseEntry.setDeviceIdentifier(entry.getDeviceIdentifier());
@@ -368,8 +368,8 @@ public class SendPushNotification extends AbstractProcessor {
 		boolean payload_content_available = context.getProperty(PAYLOAD_CONTENT_AVAILABLE).evaluateAttributeExpressions(flowFile).asBoolean();
 		String payload_category = context.getProperty(PAYLOAD_CATEGORY).evaluateAttributeExpressions(flowFile).getValue();
 		String payload_threadID = context.getProperty(PAYLOAD_THREAD_ID).evaluateAttributeExpressions(flowFile).getValue();
-		
 		String deviceIdentifier = context.getProperty(DEVICE_TOKEN).evaluateAttributeExpressions(flowFile).getValue();
+		
 		if (StringUtil.isNullOrEmpty(deviceIdentifier)) {
 			deviceIdentifier = "";
 		}
@@ -398,3 +398,4 @@ public class SendPushNotification extends AbstractProcessor {
 
 
 }
+

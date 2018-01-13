@@ -1,0 +1,3 @@
+org/apache/nifi/processors/sendpushnotification/PushEntry.class
+org/apache/nifi/processors/sendpushnotification/SendPushNotification.class
+org/apache/nifi/processors/sendpushnotification/SendPushNotification$1.class
