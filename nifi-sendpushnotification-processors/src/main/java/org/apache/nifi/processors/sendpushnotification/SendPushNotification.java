@@ -183,9 +183,7 @@ public class SendPushNotification extends AbstractProcessor {
 
     private static Queue<PushEntry> workLoad = new LinkedList<PushEntry>();
     private static Queue<PushEntry> response = new LinkedList<PushEntry>();
-    
-    private ApnsClient apnsClient = null;
-    
+        
     @Override
     protected void init(final ProcessorInitializationContext context) {
         final List<PropertyDescriptor> descriptors = new ArrayList<PropertyDescriptor>();
@@ -219,14 +217,6 @@ public class SendPushNotification extends AbstractProcessor {
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
         return descriptors;
     }
-    
-    @OnUnscheduled
-    public void onUnscheduled() {
-    	if (apnsClient != null) {
-    		apnsClient.close();
-    	}
-    }
-
 
     @OnScheduled
     public void onScheduled(final ProcessContext context) {
@@ -290,7 +280,7 @@ public class SendPushNotification extends AbstractProcessor {
             SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(token, apns_name, payload);
 
         	try {
-        		apnsClient = new ApnsClientBuilder()
+        		final ApnsClient apnsClient = new ApnsClientBuilder()
         				.setClientCredentials(new File(cert_file), cert_password)
         				.setApnsServer(hostname, port)
         				.build();
