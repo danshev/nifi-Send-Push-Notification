@@ -48,16 +48,11 @@ import io.netty.util.internal.StringUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -74,7 +69,7 @@ public class SendPushNotification extends AbstractProcessor {
             .Builder().name("APNS_SERVER")
             .displayName("APNs Server Endpoint")
             .defaultValue("Development")
-            .expressionLanguageSupported(true)
+            .expressionLanguageSupported(false)
             .allowableValues("Production", "Development")
             .required(true)
             .build();
@@ -83,7 +78,7 @@ public class SendPushNotification extends AbstractProcessor {
     public static final PropertyDescriptor APNS_NAME = new PropertyDescriptor
             .Builder().name("APNS_NAME")
             .displayName("Apple Identifier")
-            .expressionLanguageSupported(true)
+            .expressionLanguageSupported(false)
             .description("The unique identifier registered with Apple, typically in reverse DNS format (ex: com.example.app)")
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(true)
@@ -93,7 +88,7 @@ public class SendPushNotification extends AbstractProcessor {
             .Builder().name("CERT_FILE")
             .displayName("Certificate File")
             .description("The filepath to your .p12 file (created from the .cert downloaded from Apple)")
-            .expressionLanguageSupported(true)
+            .expressionLanguageSupported(false)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(true)
             .build();
@@ -103,7 +98,7 @@ public class SendPushNotification extends AbstractProcessor {
             .Builder().name("CERT_PASSWORD")
             .displayName("Certificate File Password")
             .description("If necessary, the password for the Certificate File")
-            .expressionLanguageSupported(true)
+            .expressionLanguageSupported(false)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .sensitive(true)
             .required(false)
@@ -239,12 +234,6 @@ public class SendPushNotification extends AbstractProcessor {
 		final String apns_name = context.getProperty(APNS_NAME).getValue();
 		final String cert_file = context.getProperty(CERT_FILE).getValue();
 		final String cert_password = context.getProperty(CERT_PASSWORD).getValue();
-		final Integer payload_badge = context.getProperty(PAYLOAD_BADGE).asInteger();
-		final String payload_alert = context.getProperty(PAYLOAD_ALERT).getValue();
-		final String payload_sound = context.getProperty(PAYLOAD_SOUND).getValue();
-		final boolean payload_content_available = context.getProperty(PAYLOAD_CONTENT_AVAILABLE).asBoolean();
-		final String payload_category = context.getProperty(PAYLOAD_CATEGORY).getValue();
-		final String payload_threadID = context.getProperty(PAYLOAD_THREAD_ID).getValue();
 
     	String hostname = "";
     	int port = 443;
@@ -265,6 +254,13 @@ public class SendPushNotification extends AbstractProcessor {
         	
     		final ApnsPayloadBuilder payloadBuilder = new ApnsPayloadBuilder();
             payloadBuilder.setAlertBody(entry.getContent());
+
+            Integer payload_badge = entry.getPayload_badge();
+            String payload_alert = entry.getPayload_alert();
+            String payload_category = entry.getPayload_category();
+            String payload_sound = entry.getPayload_sound();
+            boolean payload_content_available = entry.isPayload_content_available();
+            String payload_threadID = entry.getPayload_threadID();
             
             if (payload_badge != null) {
             	payloadBuilder.setBadgeNumber(payload_badge);
@@ -366,9 +362,14 @@ public class SendPushNotification extends AbstractProcessor {
             return;
         }
         
-        context.getProperty(PAYLOAD_ALERT).getValue();
-        
-		String deviceIdentifier = context.getProperty(DEVICE_TOKEN).getValue();
+		Integer payload_badge = context.getProperty(PAYLOAD_BADGE).evaluateAttributeExpressions(flowFile).asInteger();
+		String payload_alert = context.getProperty(PAYLOAD_ALERT).evaluateAttributeExpressions(flowFile).getValue();
+		String payload_sound = context.getProperty(PAYLOAD_SOUND).evaluateAttributeExpressions(flowFile).getValue();
+		boolean payload_content_available = context.getProperty(PAYLOAD_CONTENT_AVAILABLE).evaluateAttributeExpressions(flowFile).asBoolean();
+		String payload_category = context.getProperty(PAYLOAD_CATEGORY).evaluateAttributeExpressions(flowFile).getValue();
+		String payload_threadID = context.getProperty(PAYLOAD_THREAD_ID).evaluateAttributeExpressions(flowFile).getValue();
+		
+		String deviceIdentifier = context.getProperty(DEVICE_TOKEN).evaluateAttributeExpressions(flowFile).getValue();
 		if (StringUtil.isNullOrEmpty(deviceIdentifier)) {
 			deviceIdentifier = "";
 		}
@@ -381,6 +382,12 @@ public class SendPushNotification extends AbstractProcessor {
         PushEntry entry = new PushEntry();
         entry.setContent(contents);
         entry.setDeviceIdentifier(deviceIdentifier);
+        entry.setPayload_badge(payload_badge);
+        entry.setPayload_alert(payload_alert);
+        entry.setPayload_category(payload_category);
+        entry.setPayload_sound(payload_sound);
+        entry.setPayload_content_available(payload_content_available);
+        entry.setPayload_threadID(payload_threadID);
         
         workLoad.add(entry);
         session.transfer(flowFile, PUBLISHED);
