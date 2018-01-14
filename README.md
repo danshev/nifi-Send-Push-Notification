@@ -31,4 +31,4 @@ Due to the inherent delay between sending a *request* (to APNs) to push data to 
  2. **Sent to APNs**: nothing broke and your request was made (continue on with your Flow)
  3. **APNs Response**: the result of your request (whether it was successful ... or not)
 
- 	> The APNs Response is also where you will receive information as to whether the remote device has unregistered (aka: the Device Token is no longer valid and needs to be removed / deactivated in your database)
+ 	> The APNs Response is also where you will receive information as to whether the remote device has unregistered (aka: the Device Token is no longer valid) and should be removed from / deactivated in your database.
