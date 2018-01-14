@@ -32,3 +32,7 @@ Due to the inherent delay between sending a *request* (to APNs) to push data to 
  3. **APNs Response**: the result of your request (whether it was successful ... or not)
 
  	> The APNs Response is also where you will receive information as to whether the remote device has unregistered (aka: the Device Token is no longer valid) and should be removed from / deactivated in your database.
+
+
+### Note on behavior ###
+Due to the mechanics of this processor, the `APNs response` will not be released / emitted until a new FlowFile hits the processor.  For example, if you were to use a GenerateFlowFile processor to route a single FlowFile to  SendPushNotification, you would only receive a **Sent to APNs** output.  You will not see the **APNs Response** output until you send a second FlowFile to SendPushNotification.
