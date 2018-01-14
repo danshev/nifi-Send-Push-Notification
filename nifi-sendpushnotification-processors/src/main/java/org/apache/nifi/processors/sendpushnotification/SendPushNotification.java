@@ -101,6 +101,7 @@ public class SendPushNotification extends AbstractProcessor {
             .expressionLanguageSupported(false)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(false)
+            .sensitive(true)
             .build();
 
     public static final PropertyDescriptor DEVICE_TOKEN = new PropertyDescriptor
@@ -180,9 +181,9 @@ public class SendPushNotification extends AbstractProcessor {
             .build();
 
 
-    public static final Relationship PUBLISHED = new Relationship.Builder()
-            .name("Published")
-            .description("Published to APNS")
+    public static final Relationship SENT = new Relationship.Builder()
+            .name("Sent to APNs")
+            .description("Sent to APNs")
             .build();
 
     public static final Relationship ERROR = new Relationship.Builder()
@@ -190,9 +191,9 @@ public class SendPushNotification extends AbstractProcessor {
             .description("Error")
             .build();
 
-    public static final Relationship STATUS = new Relationship.Builder()
-            .name("Publish Status")
-            .description("Published to APNs Successfuly")
+    public static final Relationship RESPONSE = new Relationship.Builder()
+            .name("APNs Response")
+            .description("APNs Response")
             .build();
 
     private List<PropertyDescriptor> descriptors;
@@ -220,9 +221,9 @@ public class SendPushNotification extends AbstractProcessor {
         this.descriptors = Collections.unmodifiableList(descriptors);
 
         final Set<Relationship> relationships = new HashSet<Relationship>();
-        relationships.add(PUBLISHED);
+        relationships.add(SENT);
         relationships.add(ERROR);
-        relationships.add(STATUS);
+        relationships.add(RESPONSE);
         this.relationships = Collections.unmodifiableSet(relationships);
 
     }
@@ -379,7 +380,7 @@ public class SendPushNotification extends AbstractProcessor {
                         f = session.putAttribute(f, "deviceIdentifier", responseEntry.getDeviceIdentifier());
                         f = session.putAttribute(f, "content", responseEntry.getContent());
                         f = session.putAttribute(f, "status", responseEntry.getStatus());
-                        session.transfer(f, STATUS);
+                        session.transfer(f, RESPONSE);
                 }
         }
 
@@ -418,7 +419,7 @@ public class SendPushNotification extends AbstractProcessor {
         entry.setPayload_threadID(payload_threadID);
 
         workLoad.add(entry);
-        session.transfer(flowFile, PUBLISHED);
+        session.transfer(flowFile, SENT);
 
     }
 
