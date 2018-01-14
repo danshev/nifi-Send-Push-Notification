@@ -99,8 +99,7 @@ public class SendPushNotification extends AbstractProcessor {
             .displayName("Certificate File Password")
             .description("If necessary, the password for the Certificate File")
             .expressionLanguageSupported(false)
-            .addValidator(StandardValidators.StringLengthValidator.VALID)
-            .sensitive(true)
+            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(false)
             .build();
 
