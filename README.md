@@ -11,7 +11,7 @@ Sends a HTTP/2 message with JSON to Apple's Push Notification service (APNs).  B
 
 ## Configuration ##
 
-After NiFi restarts and you've added the processor to your canvass ...
+After NiFi restarts and you've added the processor to your canvas ...
 
  - Apple Identifier (ex: com.example.app-id)
  - Filepath to your p12 certificate
@@ -20,15 +20,15 @@ After NiFi restarts and you've added the processor to your canvass ...
  - Device (or 'push') token to which to send
  - How you want to build the JSON to be pushed
 
- 	> If "Use JSON from FlowFile Content" is set to `False`, then the JSON payload will be populated using the properties of this process. If 'Use JSON from FlowFile Content' is set to `True`, then the FlowFile content will be sent as-is.
+ 	> If "Use JSON from FlowFile Content" is set to `False`, then the JSON payload will be populated using the processor's properties.  If 'Use JSON from FlowFile Content' is set to `True`, then the FlowFile content will be assumed to be correctly-formatted and sent as-is.
 
 
 ## Usage ##
 
 Due to the inherent delay between sending a *request* (to APNs) to push data to a remote device and *the result* of that request, the SendPushNotification processor has three relationships:
 
- 1. Error -- something went wrong and your request was **not made**
- 2. Sent to APNs -- nothing broke and your request was made (now, continue your Flow)
- 3. APNs Response -- the result of your request (whether it was successful ... or not)
+ 1. **Error**: something went wrong and your request was **not made**
+ 2. **Sent to APNs**: nothing broke and your request was made (continue on with your Flow)
+ 3. **APNs Response**: the result of your request (whether it was successful ... or not)
 
  	> The APNs Response is also where you will receive information as to whether the remote device has unregistered (aka: the Device Token is no longer valid and needs to be removed / deactivated in your database)
