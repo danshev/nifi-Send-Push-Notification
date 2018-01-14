@@ -63,7 +63,7 @@ import java.util.Set;
 @WritesAttributes({@WritesAttribute(attribute="", description="")})
 public class SendPushNotification extends AbstractProcessor {
 
-	
+
 
     public static final PropertyDescriptor APNS_SERVER = new PropertyDescriptor
             .Builder().name("APNS_SERVER")
@@ -73,7 +73,7 @@ public class SendPushNotification extends AbstractProcessor {
             .allowableValues("Production", "Development")
             .required(true)
             .build();
-	
+
 
     public static final PropertyDescriptor APNS_NAME = new PropertyDescriptor
             .Builder().name("APNS_NAME")
@@ -92,18 +92,17 @@ public class SendPushNotification extends AbstractProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(true)
             .build();
-    
+
 
     public static final PropertyDescriptor CERT_PASSWORD = new PropertyDescriptor
             .Builder().name("CERT_PASSWORD")
             .displayName("Certificate File Password")
             .description("If necessary, the password for the Certificate File")
             .expressionLanguageSupported(false)
-            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .sensitive(true)
             .required(false)
             .build();
-    
+
     public static final PropertyDescriptor DEVICE_TOKEN = new PropertyDescriptor
             .Builder().name("DEVICE_TOKEN")
             .displayName("Device Token (or 'Push Token')")
@@ -111,7 +110,7 @@ public class SendPushNotification extends AbstractProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(false)
             .build();
-    
+
     public static final PropertyDescriptor CUSTOM_PAYLOAD = new PropertyDescriptor
             .Builder().name("CUSTOM_PAYLOAD")
             .displayName("Use JSON from FlowFile Content")
@@ -121,7 +120,7 @@ public class SendPushNotification extends AbstractProcessor {
             .addValidator(StandardValidators.BOOLEAN_VALIDATOR)
             .required(true)
             .build();
-    
+
     public static final PropertyDescriptor PAYLOAD_BADGE = new PropertyDescriptor
             .Builder().name("PAYLOAD_BADGE")
             .displayName("Payload: Badge")
@@ -129,7 +128,7 @@ public class SendPushNotification extends AbstractProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(false)
             .build();
-    
+
     public static final PropertyDescriptor PAYLOAD_ALERT_TITLE = new PropertyDescriptor
             .Builder().name("PAYLOAD_ALERT_TITLE")
             .displayName("Payload: Alert Title")
@@ -137,7 +136,7 @@ public class SendPushNotification extends AbstractProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(false)
             .build();
-    
+
     public static final PropertyDescriptor PAYLOAD_ALERT_BODY = new PropertyDescriptor
             .Builder().name("PAYLOAD_ALERT_BODY")
             .displayName("Payload: Alert Body")
@@ -145,7 +144,7 @@ public class SendPushNotification extends AbstractProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(false)
             .build();
-    
+
     public static final PropertyDescriptor PAYLOAD_SOUND = new PropertyDescriptor
             .Builder().name("PAYLOAD_SOUND")
             .displayName("Payload: Sound")
@@ -153,7 +152,7 @@ public class SendPushNotification extends AbstractProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(false)
             .build();
-    
+
     public static final PropertyDescriptor PAYLOAD_CONTENT_AVAILABLE = new PropertyDescriptor
             .Builder().name("PAYLOAD_CONTENT_AVAILABLE")
             .displayName("Payload: Content-Available")
@@ -171,7 +170,7 @@ public class SendPushNotification extends AbstractProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .required(false)
             .build();
-    
+
     public static final PropertyDescriptor PAYLOAD_THREAD_ID = new PropertyDescriptor
             .Builder().name("PAYLOAD_THREAD_ID")
             .displayName("Payload: Thread ID")
@@ -195,13 +194,13 @@ public class SendPushNotification extends AbstractProcessor {
             .name("Publish Status")
             .description("Published to APNs Successfuly")
             .build();
-    
+
     private List<PropertyDescriptor> descriptors;
     private Set<Relationship> relationships;
 
     private static Queue<PushEntry> workLoad = new LinkedList<PushEntry>();
     private static Queue<PushEntry> response = new LinkedList<PushEntry>();
-        
+
     @Override
     protected void init(final ProcessorInitializationContext context) {
         final List<PropertyDescriptor> descriptors = new ArrayList<PropertyDescriptor>();
@@ -225,7 +224,7 @@ public class SendPushNotification extends AbstractProcessor {
         relationships.add(ERROR);
         relationships.add(STATUS);
         this.relationships = Collections.unmodifiableSet(relationships);
-        
+
     }
 
     @Override
@@ -240,36 +239,41 @@ public class SendPushNotification extends AbstractProcessor {
 
     @OnScheduled
     public void onScheduled(final ProcessContext context) {
-		final String apns_server = context.getProperty(APNS_SERVER).getValue();
-		final String apns_name = context.getProperty(APNS_NAME).getValue();
-		final String cert_file = context.getProperty(CERT_FILE).getValue();
-		final String cert_password = context.getProperty(CERT_PASSWORD).getValue();
-		final boolean custom_payload = context.getProperty(CUSTOM_PAYLOAD).asBoolean();
+        final String apns_server = context.getProperty(APNS_SERVER).getValue();
+        final String apns_name = context.getProperty(APNS_NAME).getValue();
+        final String cert_file = context.getProperty(CERT_FILE).getValue();
+        final boolean custom_payload = context.getProperty(CUSTOM_PAYLOAD).asBoolean();
+        
+        String cert_password = context.getProperty(CERT_PASSWORD).getValue();
+        
+        if (StringUtil.isNullOrEmpty(cert_password)) {
+        	cert_password = "";
+        }
 
-    	String hostname = "";
-    	int port = 443;
-    	
-    	if (apns_server.equals("Production")) {
-    		hostname = "api.push.apple.com";
-    	}
-    	else {
-    		hostname = "api.development.push.apple.com";
-    	}
-    	
-    	while (true) {
-    		PushEntry entry = workLoad.poll();
-    		if (entry == null) {
-    			break;
-    		}
+        String hostname = "";
+        int port = 443;
 
-        	
+        if (apns_server.equals("Production")) {
+                hostname = "api.push.apple.com";
+        }
+        else {
+                hostname = "api.development.push.apple.com";
+        }
+
+        while (true) {
+                PushEntry entry = workLoad.poll();
+                if (entry == null) {
+                        break;
+                }
+
+
             String payload = "";
             if (custom_payload) {
-            	payload = entry.getContent();
+                payload = entry.getContent();
             }
             else {
 
-        		final ApnsPayloadBuilder payloadBuilder = new ApnsPayloadBuilder();
+                        final ApnsPayloadBuilder payloadBuilder = new ApnsPayloadBuilder();
 
                 Integer payload_badge = entry.getPayload_badge();
                 String payload_alert_body = entry.getPayload_alert_body();
@@ -278,17 +282,17 @@ public class SendPushNotification extends AbstractProcessor {
                 String payload_sound = entry.getPayload_sound();
                 boolean payload_content_available = entry.isPayload_content_available();
                 String payload_threadID = entry.getPayload_threadID();
-                
+
                 if (payload_badge != null) {
-                	payloadBuilder.setBadgeNumber(payload_badge);
+                        payloadBuilder.setBadgeNumber(payload_badge);
                 }
-                
+
                 if (!StringUtil.isNullOrEmpty(payload_sound)) {
-                	payloadBuilder.setSoundFileName(payload_sound);
+                        payloadBuilder.setSoundFileName(payload_sound);
                 }
-                
+
                 if (!StringUtil.isNullOrEmpty(payload_category)) {
-                	payloadBuilder.setCategoryName(payload_category);
+                        payloadBuilder.setCategoryName(payload_category);
                 }
 
                 if (!StringUtil.isNullOrEmpty(payload_threadID)) {
@@ -302,102 +306,102 @@ public class SendPushNotification extends AbstractProcessor {
                 if (!StringUtil.isNullOrEmpty(payload_alert_body)) {
                     payloadBuilder.setAlertBody(payload_alert_body);
                 }
-                
+
                 payloadBuilder.setContentAvailable(payload_content_available);
-            	payload = payloadBuilder.buildWithDefaultMaximumLength();
+                payload = payloadBuilder.buildWithDefaultMaximumLength();
             }
-            
+
             final String token = TokenUtil.sanitizeTokenString(entry.getDeviceIdentifier());
 
             SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(token, apns_name, payload);
 
-        	try {
-        		final ApnsClient apnsClient = new ApnsClientBuilder()
-        				.setClientCredentials(new File(cert_file), cert_password)
-        				.setApnsServer(hostname, port)
-        				.build();
+                try {
+                        final ApnsClient apnsClient = new ApnsClientBuilder()
+                                        .setClientCredentials(new File(cert_file), cert_password)
+                                        .setApnsServer(hostname, port)
+                                        .build();
 
                 final Future<PushNotificationResponse<SimpleApnsPushNotification>> sendNotificationFuture =
                         apnsClient.sendNotification(pushNotification);
-                
-                sendNotificationFuture.addListener(new GenericFutureListener<Future<PushNotificationResponse>>() {            	  
-                	@Override
-                	  public void operationComplete(final Future<PushNotificationResponse> future) throws Exception {
-                	    if (future.isSuccess()) {        	
-                	      final PushNotificationResponse<SimpleApnsPushNotification> pushNotificationResponse =
-                	          sendNotificationFuture.get();
-                	      if (pushNotificationResponse.isAccepted()) {
-                  	    	  getLogger().info("SendPushNotification: Accepted");
-                	    	  PushEntry responseEntry = new PushEntry();
-                	    	  responseEntry.setContent(entry.getContent());
-                	    	  responseEntry.setDeviceIdentifier(entry.getDeviceIdentifier());
-                	    	  responseEntry.setStatus("Push Accepted");
-                	    	  response.add(responseEntry);
-                	      }
-                	      else {
-                  	    	  getLogger().error("SendPushNotification: Denied for " + entry.getDeviceIdentifier() + ". Reason: " + pushNotificationResponse.getRejectionReason());
-                	    	  PushEntry responseEntry = new PushEntry();
-                	    	  responseEntry.setContent(entry.getContent());
-                	    	  responseEntry.setDeviceIdentifier(entry.getDeviceIdentifier());
-                	    	  responseEntry.setStatus("Push Denied: " + pushNotificationResponse.getRejectionReason());
-                	    	  response.add(responseEntry);
-                	      }
-                	    }
-                	    else {
-                	      getLogger().error("SendPushNotification: Failure");
-              	    	  PushEntry responseEntry = new PushEntry();
-              	    	  responseEntry.setContent(entry.getContent());
-              	    	  responseEntry.setDeviceIdentifier(entry.getDeviceIdentifier());
-              	    	  responseEntry.setStatus("Push Failure");
-              	    	  response.add(responseEntry);
-                	    }
-                	  }
-                });
-        	}
-        	catch (Exception e) {
-            	getLogger().error("SendPushNotification: Client Connection Error: " + e);
-            	e.printStackTrace();
 
-        	}
+                sendNotificationFuture.addListener(new GenericFutureListener<Future<PushNotificationResponse>>() {
+                        @Override
+                          public void operationComplete(final Future<PushNotificationResponse> future) throws Exception {
+                            if (future.isSuccess()) {
+                              final PushNotificationResponse<SimpleApnsPushNotification> pushNotificationResponse =
+                                  sendNotificationFuture.get();
+                              if (pushNotificationResponse.isAccepted()) {
+                                  getLogger().info("SendPushNotification: Accepted");
+                                  PushEntry responseEntry = new PushEntry();
+                                  responseEntry.setContent(entry.getContent());
+                                  responseEntry.setDeviceIdentifier(entry.getDeviceIdentifier());
+                                  responseEntry.setStatus("Push Accepted");
+                                  response.add(responseEntry);
+                              }
+                              else {
+                                  getLogger().error("SendPushNotification: Denied for " + entry.getDeviceIdentifier() + ". Reason: " + pushNotificationResponse.getRejectionReason());
+                                  PushEntry responseEntry = new PushEntry();
+                                  responseEntry.setContent(entry.getContent());
+                                  responseEntry.setDeviceIdentifier(entry.getDeviceIdentifier());
+                                  responseEntry.setStatus("Push Denied: " + pushNotificationResponse.getRejectionReason());
+                                  response.add(responseEntry);
+                              }
+                            }
+                            else {
+                              getLogger().error("SendPushNotification: Failure");
+                          PushEntry responseEntry = new PushEntry();
+                          responseEntry.setContent(entry.getContent());
+                          responseEntry.setDeviceIdentifier(entry.getDeviceIdentifier());
+                          responseEntry.setStatus("Push Failure");
+                          response.add(responseEntry);
+                            }
+                          }
+                });
+                }
+                catch (Exception e) {
+                getLogger().error("SendPushNotification: Client Connection Error: " + e);
+                e.printStackTrace();
+
+                }
         }
     }
 
     @Override
     public void onTrigger(final ProcessContext context, final ProcessSession session) throws ProcessException {
-		onScheduled(context);
-    	while (true) {
-    		PushEntry responseEntry = response.poll();
-    		if (responseEntry == null) {
-    			break;
-    		}
-    		else {
-    			FlowFile f = session.create();
-    			f = session.putAttribute(f, "deviceIdentifier", responseEntry.getDeviceIdentifier());
-    			f = session.putAttribute(f, "content", responseEntry.getContent());
-    			f = session.putAttribute(f, "status", responseEntry.getStatus());
-    			session.transfer(f, STATUS);
-    		}
-    	}
-    	
+                onScheduled(context);
+        while (true) {
+                PushEntry responseEntry = response.poll();
+                if (responseEntry == null) {
+                        break;
+                }
+                else {
+                        FlowFile f = session.create();
+                        f = session.putAttribute(f, "deviceIdentifier", responseEntry.getDeviceIdentifier());
+                        f = session.putAttribute(f, "content", responseEntry.getContent());
+                        f = session.putAttribute(f, "status", responseEntry.getStatus());
+                        session.transfer(f, STATUS);
+                }
+        }
+
         FlowFile flowFile = session.get();
         if ( flowFile == null ) {
             return;
         }
-        
-		Integer payload_badge = context.getProperty(PAYLOAD_BADGE).evaluateAttributeExpressions(flowFile).asInteger();
-		String payload_alert_title = context.getProperty(PAYLOAD_ALERT_TITLE).evaluateAttributeExpressions(flowFile).getValue();
-		String payload_alert_body = context.getProperty(PAYLOAD_ALERT_BODY).evaluateAttributeExpressions(flowFile).getValue();
-		String payload_sound = context.getProperty(PAYLOAD_SOUND).evaluateAttributeExpressions(flowFile).getValue();
-		boolean payload_content_available = context.getProperty(PAYLOAD_CONTENT_AVAILABLE).evaluateAttributeExpressions(flowFile).asBoolean();
-		String payload_category = context.getProperty(PAYLOAD_CATEGORY).evaluateAttributeExpressions(flowFile).getValue();
-		String payload_threadID = context.getProperty(PAYLOAD_THREAD_ID).evaluateAttributeExpressions(flowFile).getValue();
-		String deviceIdentifier = context.getProperty(DEVICE_TOKEN).evaluateAttributeExpressions(flowFile).getValue();
-		
-		if (StringUtil.isNullOrEmpty(deviceIdentifier)) {
-			deviceIdentifier = "";
-		}
+
+                Integer payload_badge = context.getProperty(PAYLOAD_BADGE).evaluateAttributeExpressions(flowFile).asInteger();
+                String payload_alert_title = context.getProperty(PAYLOAD_ALERT_TITLE).evaluateAttributeExpressions(flowFile).getValue();
+                String payload_alert_body = context.getProperty(PAYLOAD_ALERT_BODY).evaluateAttributeExpressions(flowFile).getValue();
+                String payload_sound = context.getProperty(PAYLOAD_SOUND).evaluateAttributeExpressions(flowFile).getValue();
+                boolean payload_content_available = context.getProperty(PAYLOAD_CONTENT_AVAILABLE).evaluateAttributeExpressions(flowFile).asBoolean();
+                String payload_category = context.getProperty(PAYLOAD_CATEGORY).evaluateAttributeExpressions(flowFile).getValue();
+                String payload_threadID = context.getProperty(PAYLOAD_THREAD_ID).evaluateAttributeExpressions(flowFile).getValue();
+                String deviceIdentifier = context.getProperty(DEVICE_TOKEN).evaluateAttributeExpressions(flowFile).getValue();
+
+                if (StringUtil.isNullOrEmpty(deviceIdentifier)) {
+                        deviceIdentifier = "";
+                }
         // A device token is an identifier for the Apple Push Notification System for iOS devices. Apple assigns a Device Token on a per-app basis (iOS 7 and later) which is used as a unique identifier for sending push notifications. Each device has two device tokens per app: one for development, and one for production (ad hoc or app store builds). The tokens are 64 hexadecimal characters.
-        
+
         final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         session.exportTo(flowFile, bytes);
         final String contents = bytes.toString();
@@ -412,10 +416,10 @@ public class SendPushNotification extends AbstractProcessor {
         entry.setPayload_sound(payload_sound);
         entry.setPayload_content_available(payload_content_available);
         entry.setPayload_threadID(payload_threadID);
-        
+
         workLoad.add(entry);
         session.transfer(flowFile, PUBLISHED);
-        
+
     }
 
 
