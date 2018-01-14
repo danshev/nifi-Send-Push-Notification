@@ -60,5 +60,5 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase name="testProcessor" classname="org.apache.nifi.processors.sendpushnotification.SendPushNotificationTest" time="0.296"/>
+  <testcase name="testProcessor" classname="org.apache.nifi.processors.sendpushnotification.SendPushNotificationTest" time="0.264"/>
 </testsuite>

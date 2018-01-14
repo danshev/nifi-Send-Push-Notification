@@ -99,6 +99,7 @@ public class SendPushNotification extends AbstractProcessor {
             .displayName("Certificate File Password")
             .description("If necessary, the password for the Certificate File")
             .expressionLanguageSupported(false)
+            .addValidator(StandardValidators.NON_BLANK_VALIDATOR)
             .sensitive(true)
             .required(false)
             .build();
@@ -108,7 +109,7 @@ public class SendPushNotification extends AbstractProcessor {
             .displayName("Device Token (or 'Push Token')")
             .expressionLanguageSupported(true)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-            .required(false)
+            .required(true)
             .build();
 
     public static final PropertyDescriptor CUSTOM_PAYLOAD = new PropertyDescriptor
