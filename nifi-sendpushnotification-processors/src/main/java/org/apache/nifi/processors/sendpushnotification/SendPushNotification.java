@@ -57,7 +57,7 @@ import java.util.Queue;
 import java.util.Set;
 
 @Tags({"apns apn push"})
-@CapabilityDescription("Sends a JSON HTTP/2 message to Apple's Push Notification service (APNs).")
+@CapabilityDescription("Sends a HTTP/2 message with JSON to Apple's Push Notification service (APNs). If 'Use JSON from FlowFile Content' is set to False, then the JSON payload will be populated using the properties of this process. If 'Use JSON from FlowFile Content' is set to True, then the FlowFile content will be sent as-is.")
 @SeeAlso({})
 @ReadsAttributes({@ReadsAttribute(attribute="", description="")})
 @WritesAttributes({@WritesAttribute(attribute="", description="")})
@@ -114,7 +114,7 @@ public class SendPushNotification extends AbstractProcessor {
     
     public static final PropertyDescriptor CUSTOM_PAYLOAD = new PropertyDescriptor
             .Builder().name("CUSTOM_PAYLOAD")
-            .displayName("Custom Payload Based on FlowFile Body JSON")
+            .displayName("Use JSON from FlowFile Content")
             .defaultValue("false")
             .allowableValues("true", "false")
             .expressionLanguageSupported(false)
