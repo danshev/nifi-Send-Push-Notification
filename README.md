@@ -2,6 +2,8 @@
 
 Sends a HTTP/2 message with JSON to Apple's Push Notification service (APNs).  Built off the [Pushy](https://github.com/relayrides/pushy) Java library.
 
+![Example setup](https://raw.githubusercontent.com/danshev/nifi-Send-Push-Notification/master/push-example-setup.png)
+
 ## Installation ##
 
  1. [Download complied NAR](https://github.com/danshev/SendPushNotification/blob/master/nifi-sendpushnotification-nar-1.0-SNAPSHOT.nar) into NiFi's `/lib/` directory.
