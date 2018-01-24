@@ -15,7 +15,7 @@ Sends a HTTP/2 message with JSON to Apple's Push Notification service (APNs).  B
 
 After NiFi restarts and you've added the processor to your canvas ...
 
- - Create / configure an instance of the Apple Push Notification Connection Service
+ - Create / [configure](https://github.com/danshev/nifi-apn-connection-service/blob/master/README.md#configuration) an instance of the Apple Push Notification Connection Service
    - Filepath to your p12 certificate
    - Certificate file password
    - Apple APNs endpoint (Development / Production)
