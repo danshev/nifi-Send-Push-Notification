@@ -6,8 +6,8 @@ Sends a HTTP/2 message with JSON to Apple's Push Notification service (APNs).  B
 
 ## Installation ##
 
- 1. [Download complied NAR](https://github.com/danshev/SendPushNotification/blob/master/nifi-sendpushnotification-nar-1.0-SNAPSHOT.nar) into NiFi's `/lib/` directory.
- 2. Change permissions on the file (>`chmod 755 nifi-sendpushnotification-nar-1.0-SNAPSHOT.nar`)
+ 1. [Download complied NAR](https://github.com/danshev/SendPushNotification/blob/master/nifi-sendpushnotification-nar-1.0-SNAPSHOT.nar) and [that of the supporting controller service](https://github.com/danshev/nifi-apn-connection-service) into NiFi's `/lib/` directory.
+ 2. Change permissions of both files (`chmod 755 nifi-sendpushnotification-nar-1.0-SNAPSHOT.nar`, `chmod 755 nifi-apn-connection-service-nar-1.0-SNAPSHOT.nar`)
  3. Restart NiFi (`/bin/nifi.sh restart`)
 
 
@@ -15,10 +15,11 @@ Sends a HTTP/2 message with JSON to Apple's Push Notification service (APNs).  B
 
 After NiFi restarts and you've added the processor to your canvas ...
 
+ - Create / configure an instance of the Apple Push Notification Connection Service
+   - Filepath to your p12 certificate
+   - Certificate file password
+   - Apple APNs endpoint (Development / Production)
  - Apple Identifier (ex: com.example.app-id)
- - Filepath to your p12 certificate
- - Certificate file password
- - Apple APNs endpoint (Development / Production)
  - Device (or 'push') token to which to send
  - How you want to build the JSON to be pushed
 
