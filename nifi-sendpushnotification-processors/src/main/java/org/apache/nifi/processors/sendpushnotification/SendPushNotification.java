@@ -327,9 +327,10 @@ public class SendPushNotification extends AbstractProcessor {
     @Override
     public void onTrigger(final ProcessContext context, final ProcessSession session) throws ProcessException {
                 onScheduled(context);
+                
+    	workQueue(session);
         FlowFile flowFile = session.get();
         if ( flowFile == null ) {
-        	workQueue(session);
             return;
         }
 
@@ -364,6 +365,7 @@ public class SendPushNotification extends AbstractProcessor {
 
         workLoad.add(entry);
         session.transfer(flowFile, SENT);
+        session.commit();
 
     }
     
