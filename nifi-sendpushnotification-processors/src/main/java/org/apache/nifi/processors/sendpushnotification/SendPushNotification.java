@@ -24,6 +24,7 @@ import org.apache.nifi.annotation.behavior.WritesAttribute;
 import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.annotation.lifecycle.OnUnscheduled;
+import org.apache.nifi.apnsconnection.APNSConnectionService;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.SeeAlso;
 import org.apache.nifi.annotation.documentation.Tags;
@@ -62,6 +63,13 @@ import java.util.Set;
 @ReadsAttributes({@ReadsAttribute(attribute="", description="")})
 @WritesAttributes({@WritesAttribute(attribute="", description="")})
 public class SendPushNotification extends AbstractProcessor {
+<<<<<<< HEAD
+	
+    public static final PropertyDescriptor APNS_SERVICE = new PropertyDescriptor.Builder()
+            .name("apns-client-service")
+            .displayName("APNS Service")
+            .description("Specifies the APNS Controller Service to use for accessing APNs.")
+=======
 
 
 
@@ -71,7 +79,9 @@ public class SendPushNotification extends AbstractProcessor {
             .defaultValue("Development")
             .expressionLanguageSupported(false)
             .allowableValues("Production", "Development")
+>>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
             .required(true)
+            .identifiesControllerService(APNSConnectionService.class)
             .build();
 
 
@@ -84,6 +94,8 @@ public class SendPushNotification extends AbstractProcessor {
             .required(true)
             .build();
 
+<<<<<<< HEAD
+=======
     public static final PropertyDescriptor CERT_FILE = new PropertyDescriptor
             .Builder().name("CERT_FILE")
             .displayName("Certificate File")
@@ -104,6 +116,7 @@ public class SendPushNotification extends AbstractProcessor {
             .sensitive(true)
             .build();
 
+>>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
     public static final PropertyDescriptor DEVICE_TOKEN = new PropertyDescriptor
             .Builder().name("DEVICE_TOKEN")
             .displayName("Device Token (or 'Push Token')")
@@ -199,18 +212,25 @@ public class SendPushNotification extends AbstractProcessor {
     private List<PropertyDescriptor> descriptors;
     private Set<Relationship> relationships;
     
+<<<<<<< HEAD
+=======
     private static ApnsClient apnsClient = null;
 
+>>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
     private static Queue<PushEntry> workLoad = new LinkedList<PushEntry>();
     private static Queue<PushEntry> response = new LinkedList<PushEntry>();
 
     @Override
     protected void init(final ProcessorInitializationContext context) {
         final List<PropertyDescriptor> descriptors = new ArrayList<PropertyDescriptor>();
+        descriptors.add(APNS_SERVICE);
         descriptors.add(APNS_NAME);
+<<<<<<< HEAD
+=======
         descriptors.add(CERT_FILE);
         descriptors.add(CERT_PASSWORD);
         descriptors.add(APNS_SERVER);
+>>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
         descriptors.add(DEVICE_TOKEN);
         descriptors.add(CUSTOM_PAYLOAD);
         descriptors.add(PAYLOAD_BADGE);
@@ -239,6 +259,19 @@ public class SendPushNotification extends AbstractProcessor {
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
         return descriptors;
     }
+<<<<<<< HEAD
+
+    @OnScheduled
+    public void onScheduled(final ProcessContext context) {
+        final String apns_name = context.getProperty(APNS_NAME).getValue();
+        final boolean custom_payload = context.getProperty(CUSTOM_PAYLOAD).asBoolean();
+        
+        while (true) {
+            PushEntry entry = workLoad.poll();
+            if (entry != null) {
+            	
+                final APNSConnectionService apnsService = context.getProperty(APNS_SERVICE).asControllerService(APNSConnectionService.class);
+=======
     
     @OnUnscheduled
     public void onUnscheduled() {
@@ -273,6 +306,7 @@ public class SendPushNotification extends AbstractProcessor {
             PushEntry entry = workLoad.poll();
             if (entry != null) {
 	
+>>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
 	
 	            String payload = "";
 	            if (custom_payload) {
@@ -324,6 +358,11 @@ public class SendPushNotification extends AbstractProcessor {
 	
 	                try {
 	                	
+<<<<<<< HEAD
+	
+	                final Future<PushNotificationResponse<SimpleApnsPushNotification>> sendNotificationFuture =
+	                        apnsService.getConnection().sendNotification(pushNotification);
+=======
 	                	if (apnsClient == null) {
 	                        apnsClient = new ApnsClientBuilder()
 	                                        .setClientCredentials(new File(cert_file), cert_password)
@@ -333,6 +372,7 @@ public class SendPushNotification extends AbstractProcessor {
 	
 	                final Future<PushNotificationResponse<SimpleApnsPushNotification>> sendNotificationFuture =
 	                        apnsClient.sendNotification(pushNotification);
+>>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
 	
 	                sendNotificationFuture.addListener(new GenericFutureListener<Future<PushNotificationResponse>>() {
 	                        @Override
@@ -444,4 +484,7 @@ public class SendPushNotification extends AbstractProcessor {
 
 }
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14

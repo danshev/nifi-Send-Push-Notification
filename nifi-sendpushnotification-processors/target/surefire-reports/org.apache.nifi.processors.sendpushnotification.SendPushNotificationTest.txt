@@ -1,4 +1,11 @@
+<<<<<<< HEAD
+-------------------------------------------------------------------------------
+Test set: org.apache.nifi.processors.sendpushnotification.SendPushNotificationTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.275 sec - in org.apache.nifi.processors.sendpushnotification.SendPushNotificationTest
+=======
 -------------------------------------------------------------------------------
 Test set: org.apache.nifi.processors.sendpushnotification.SendPushNotificationTest
 -------------------------------------------------------------------------------
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.506 sec - in org.apache.nifi.processors.sendpushnotification.SendPushNotificationTest
+>>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
