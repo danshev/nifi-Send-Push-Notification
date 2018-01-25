@@ -63,27 +63,15 @@ import java.util.Set;
 @ReadsAttributes({@ReadsAttribute(attribute="", description="")})
 @WritesAttributes({@WritesAttribute(attribute="", description="")})
 public class SendPushNotification extends AbstractProcessor {
-<<<<<<< HEAD
+
 	
     public static final PropertyDescriptor APNS_SERVICE = new PropertyDescriptor.Builder()
             .name("apns-client-service")
             .displayName("APNS Service")
             .description("Specifies the APNS Controller Service to use for accessing APNs.")
-=======
-
-
-
-    public static final PropertyDescriptor APNS_SERVER = new PropertyDescriptor
-            .Builder().name("APNS_SERVER")
-            .displayName("APNs Server Endpoint")
-            .defaultValue("Development")
-            .expressionLanguageSupported(false)
-            .allowableValues("Production", "Development")
->>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
             .required(true)
             .identifiesControllerService(APNSConnectionService.class)
             .build();
-
 
     public static final PropertyDescriptor APNS_NAME = new PropertyDescriptor
             .Builder().name("APNS_NAME")
@@ -94,29 +82,6 @@ public class SendPushNotification extends AbstractProcessor {
             .required(true)
             .build();
 
-<<<<<<< HEAD
-=======
-    public static final PropertyDescriptor CERT_FILE = new PropertyDescriptor
-            .Builder().name("CERT_FILE")
-            .displayName("Certificate File")
-            .description("The filepath to your .p12 file (created from the .cert downloaded from Apple)")
-            .expressionLanguageSupported(false)
-            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-            .required(true)
-            .build();
-
-
-    public static final PropertyDescriptor CERT_PASSWORD = new PropertyDescriptor
-            .Builder().name("CERT_PASSWORD")
-            .displayName("Certificate File Password")
-            .description("If necessary, the password for the Certificate File")
-            .expressionLanguageSupported(false)
-            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-            .required(false)
-            .sensitive(true)
-            .build();
-
->>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
     public static final PropertyDescriptor DEVICE_TOKEN = new PropertyDescriptor
             .Builder().name("DEVICE_TOKEN")
             .displayName("Device Token (or 'Push Token')")
@@ -211,12 +176,7 @@ public class SendPushNotification extends AbstractProcessor {
 
     private List<PropertyDescriptor> descriptors;
     private Set<Relationship> relationships;
-    
-<<<<<<< HEAD
-=======
-    private static ApnsClient apnsClient = null;
 
->>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
     private static Queue<PushEntry> workLoad = new LinkedList<PushEntry>();
     private static Queue<PushEntry> response = new LinkedList<PushEntry>();
 
@@ -225,12 +185,6 @@ public class SendPushNotification extends AbstractProcessor {
         final List<PropertyDescriptor> descriptors = new ArrayList<PropertyDescriptor>();
         descriptors.add(APNS_SERVICE);
         descriptors.add(APNS_NAME);
-<<<<<<< HEAD
-=======
-        descriptors.add(CERT_FILE);
-        descriptors.add(CERT_PASSWORD);
-        descriptors.add(APNS_SERVER);
->>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
         descriptors.add(DEVICE_TOKEN);
         descriptors.add(CUSTOM_PAYLOAD);
         descriptors.add(PAYLOAD_BADGE);
@@ -259,54 +213,17 @@ public class SendPushNotification extends AbstractProcessor {
     public final List<PropertyDescriptor> getSupportedPropertyDescriptors() {
         return descriptors;
     }
-<<<<<<< HEAD
 
     @OnScheduled
     public void onScheduled(final ProcessContext context) {
         final String apns_name = context.getProperty(APNS_NAME).getValue();
         final boolean custom_payload = context.getProperty(CUSTOM_PAYLOAD).asBoolean();
-        
-        while (true) {
-            PushEntry entry = workLoad.poll();
-            if (entry != null) {
-            	
-                final APNSConnectionService apnsService = context.getProperty(APNS_SERVICE).asControllerService(APNSConnectionService.class);
-=======
-    
-    @OnUnscheduled
-    public void onUnscheduled() {
-    	// Destroy clientEndPoint
-    	apnsClient.close();
-    }
-
-    @OnScheduled
-    public void onScheduled(final ProcessContext context) {
-        final String apns_server = context.getProperty(APNS_SERVER).getValue();
-        final String apns_name = context.getProperty(APNS_NAME).getValue();
-        final String cert_file = context.getProperty(CERT_FILE).getValue();
-        final boolean custom_payload = context.getProperty(CUSTOM_PAYLOAD).asBoolean();
-        
-        String cert_password = context.getProperty(CERT_PASSWORD).getValue();
-        
-        if (StringUtil.isNullOrEmpty(cert_password)) {
-        	cert_password = "";
-        }
-
-        String hostname = "";
-        int port = 443;
-
-        if (apns_server.equals("Production")) {
-                hostname = "api.push.apple.com";
-        }
-        else {
-                hostname = "api.development.push.apple.com";
-        }
+        final APNSConnectionService apnsService = context.getProperty(APNS_SERVICE).asControllerService(APNSConnectionService.class);
 
         while (true) {
             PushEntry entry = workLoad.poll();
             if (entry != null) {
 	
->>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
 	
 	            String payload = "";
 	            if (custom_payload) {
@@ -357,22 +274,9 @@ public class SendPushNotification extends AbstractProcessor {
 	            SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(token, apns_name, payload);
 	
 	                try {
-	                	
-<<<<<<< HEAD
 	
 	                final Future<PushNotificationResponse<SimpleApnsPushNotification>> sendNotificationFuture =
 	                        apnsService.getConnection().sendNotification(pushNotification);
-=======
-	                	if (apnsClient == null) {
-	                        apnsClient = new ApnsClientBuilder()
-	                                        .setClientCredentials(new File(cert_file), cert_password)
-	                                        .setApnsServer(hostname, port)
-	                                        .build();
-	                	}
-	
-	                final Future<PushNotificationResponse<SimpleApnsPushNotification>> sendNotificationFuture =
-	                        apnsClient.sendNotification(pushNotification);
->>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
 	
 	                sendNotificationFuture.addListener(new GenericFutureListener<Future<PushNotificationResponse>>() {
 	                        @Override
@@ -484,7 +388,4 @@ public class SendPushNotification extends AbstractProcessor {
 
 }
 
-<<<<<<< HEAD
-=======
 
->>>>>>> d6d6d50cef25de68867e90b33736348c3d403c14
