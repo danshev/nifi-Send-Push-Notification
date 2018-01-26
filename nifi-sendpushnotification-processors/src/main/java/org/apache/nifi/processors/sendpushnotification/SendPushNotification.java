@@ -331,6 +331,7 @@ public class SendPushNotification extends AbstractProcessor {
     	workQueue(session);
         FlowFile flowFile = session.get();
         if ( flowFile == null ) {
+        	sleep(1000); // After sending any responses from APNS, If there is no data, go ahead and sleep for 1 second, so that CPU isn't maxed out due to @TriggerWhenEmpty
             return;
         }
 
@@ -383,6 +384,13 @@ public class SendPushNotification extends AbstractProcessor {
             	break;
             }
     }
+    }
+    
+    private void sleep(final long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (final InterruptedException ie) {
+        }
     }
 
 
