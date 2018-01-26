@@ -20,6 +20,7 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.annotation.behavior.ReadsAttribute;
 import org.apache.nifi.annotation.behavior.ReadsAttributes;
+import org.apache.nifi.annotation.behavior.TriggerWhenEmpty;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
 import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.lifecycle.OnScheduled;
@@ -62,6 +63,7 @@ import java.util.Set;
 @SeeAlso({})
 @ReadsAttributes({@ReadsAttribute(attribute="", description="")})
 @WritesAttributes({@WritesAttribute(attribute="", description="")})
+@TriggerWhenEmpty 
 public class SendPushNotification extends AbstractProcessor {
 
 	
@@ -223,8 +225,6 @@ public class SendPushNotification extends AbstractProcessor {
         while (true) {
             PushEntry entry = workLoad.poll();
             if (entry != null) {
-	
-	
 	            String payload = "";
 	            if (custom_payload) {
 	                payload = entry.getContent();
@@ -323,11 +323,11 @@ public class SendPushNotification extends AbstractProcessor {
             }
         }
     }
-
+    
     @Override
     public void onTrigger(final ProcessContext context, final ProcessSession session) throws ProcessException {
-                onScheduled(context);
-                
+        
+    	onScheduled(context);
     	workQueue(session);
         FlowFile flowFile = session.get();
         if ( flowFile == null ) {
